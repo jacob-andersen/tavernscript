@@ -107,6 +107,7 @@ GO
 DROP TABLE IF EXISTS Received;
 
 CREATE TABLE Received(
+	Id INT IDENTITY(1,1) PRIMARY KEY,
 	SupplyId INT,
 	TavernId INT,
 	Cost DECIMAL (18,2),
@@ -136,6 +137,7 @@ CREATE TABLE Counts (
 DROP TABLE IF EXISTS Sales;
 
 CREATE TABLE Sales(
+	Id INT IDENTITY (1,1) PRIMARY KEY,
 	TavernId INT,
 	GuestId INT,
 	ServiceId INT,
@@ -231,5 +233,13 @@ CREATE TABLE Classes (
 	Name VARCHAR(50)
 	);
 GO
+
+DROP TABLE IF EXISTS SupplySales;
+
+CREATE TABLE SupplySales (
+	Id INT IDENTITY(1,1) PRIMARY KEY,
+	SupplyId INT,
+	TavernId INT
+);
 
 DROP TABLE BasementRats;
