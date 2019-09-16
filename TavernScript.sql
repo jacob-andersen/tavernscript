@@ -232,4 +232,4 @@ CREATE TABLE Classes (
 	);
 GO
 
-DROP TABLE IF EXISTS BasementRats;
+DROP TABLE BasementRats;
