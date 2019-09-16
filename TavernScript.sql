@@ -241,5 +241,6 @@ CREATE TABLE SupplySales (
 	SupplyId INT,
 	TavernId INT
 );
+GO
 
 DROP TABLE BasementRats;
