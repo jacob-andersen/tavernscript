@@ -179,7 +179,7 @@ GO
 		('Order Food',2,3),
 		('Massage',1,5)
 
-DROP TABLE IF EXISTS  Status;
+DROP TABLE IF EXISTS  ServiceStatus;
 
 CREATE TABLE ServiceStatus (
 	id TINYINT IDENTITY(1,1) PRIMARY KEY,
@@ -204,9 +204,15 @@ CREATE TABLE Guests (
 	Notes VARCHAR(MAX),
 	Birthdate DATE,
 	Cakeday DATE,
-	StatusId INT
+	Status VARCHAR(50)
 	);
 GO
+
+INSERT INTO Guests
+		(Name, Notes, Birthdate, Cakeday, Status)
+	VALUES
+		('erica','Allergic',1998-03-01,1998-01-01,'Depressed'),
+		('joan','wheelchair user',1953-07-23,1970-03-04,'Happy')
 
 DROP TABLE IF EXISTS GuestStatus;
 
@@ -215,6 +221,15 @@ CREATE TABLE GuestStatus (
 	Name VARCHAR(50)
 	);
 GO
+
+INSERT INTO GuestStatus
+		(Name)
+	VALUES
+		('active'),
+		('inactive'),
+		('discontinued'),
+		('out of stock'),
+		('coming soon')
 
 DROP TABLE IF EXISTS Levels;
 
@@ -226,6 +241,15 @@ CREATE TABLE Levels (
 	);
 GO
 
+INSERT INTO Levels
+		(GuestId, ClassId, Date)
+	VALUES
+		('active'),
+		('inactive'),
+		('discontinued'),
+		('out of stock'),
+		('coming soon')
+
 DROP TABLE IF EXISTS Classes;
 
 CREATE TABLE Classes (
@@ -233,6 +257,15 @@ CREATE TABLE Classes (
 	Name VARCHAR(50)
 	);
 GO
+
+INSERT INTO Classes
+		(Name)
+	VALUES
+		('active'),
+		('inactive'),
+		('discontinued'),
+		('out of stock'),
+		('coming soon')
 
 DROP TABLE IF EXISTS SupplySales;
 
@@ -243,4 +276,87 @@ CREATE TABLE SupplySales (
 );
 GO
 
+INSERT INTO SupplySales
+		(SupplyId, TavernId)
+	VALUES
+		('active'),
+		('inactive'),
+		('discontinued'),
+		('out of stock'),
+		('coming soon')
+
 DROP TABLE BasementRats;
+
+/* Assignment 3 */
+
+DROP TABLE IF EXISTS Rooms;
+
+CREATE TABLE Rooms (
+	Id INT IDENTITY(1,1) PRIMARY KEY,
+	RoomStatus INT,
+	TavernId INT
+	);
+GO
+
+DROP TABLE IF EXISTS RoomStays;
+
+CREATE TABLE RoomStays (
+	Id INT,
+	SaleId INT,
+	GuestId INT,
+	RoomId INT,
+	Date DATE,
+	Rate DECIMAL (18,2)
+	);
+GO
+
+	/* assignment 3.2 */
+
+	SELECT NAME FROM Guests WHERE Status='Happy'
+
+	/* assignment 3.3 */
+
+	SELECT Id FROM RoomStays WHERE Rate > 100
+
+	/* assignment 3.4 */
+
+	SELECT DISTINCT NAME FROM Guests
+
+	/* assignment 3.5 */
+
+	SELECT NAME FROM Guests ORDER BY Name ASC
+
+	/* assignment 3.6 */
+
+	SELECT TOP 10 MAX(PRICE) AS 'Top Ten Sales' FROM SALES
+
+	/* assignment 3.7 */
+
+	SELECT COLUMN_NAME AS 'Lookup Table Names' FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME IS NOT NULL
+
+	/* assignment 3.8  &  3.9 */
+
+
+	/* Not sure how to create queries ...  will ask in class */
+	
+	/* select * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='Taverns'
+
+select concat ('CREATE TABLE ','Taverns (')
+select concat (COLUMN_NAME,'(',CHARACTER_MAXIMUM_LENGTH,')')
+
+select * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='Taverns' 
+
+SELECT
+CASE
+	WHEN DATA_TYPE = VARCHAR THEN
+	SELECT concat ('(', CHARACTER_MAXIMUM_LENGTH,')')
+	concat (DATA_TYPE,' ')
+END CASE */
+
+/*
+CREATE TABLE Tavern (
+Id INT,
+Name VARCHAR(250),
+UserId INT
+);
+*/
