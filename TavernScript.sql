@@ -1,3 +1,31 @@
+DROP TABLE IF EXISTS Classes;
+
+DROP TABLE IF EXISTS SupplySales;
+
+DROP TABLE IF EXISTS Levels;
+
+DROP TABLE IF EXISTS GuestStatus;
+
+DROP TABLE IF EXISTS Guests;
+
+DROP TABLE IF EXISTS ServiceStatus;
+
+DROP TABLE IF EXISTS Services;
+
+DROP TABLE IF EXISTS Sales;
+
+DROP TABLE IF EXISTS Counts;
+
+DROP TABLE IF EXISTS Received;
+
+DROP TABLE IF EXISTS Supplies;
+
+DROP TABLE IF EXISTS Roles;
+
+DROP TABLE IF EXISTS Location
+
+DROP TABLE IF EXISTS Taverns;
+
 DROP TABLE IF EXISTS Users;
 
 CREATE TABLE Users(
@@ -11,31 +39,12 @@ GO
 	VALUES
 		('John',1),
 		('Erica',2),
-		('Peter',3),
+		('Peter',6),
 		('Allan',4),
-		('James',4)
+		('James',3)
 
-DROP TABLE IF EXISTS Taverns;
 
-CREATE TABLE Taverns(
-	Id INT IDENTITY(1,1) PRIMARY KEY,
-	Name VARCHAR (250),
-	LocationId INT,
-	OwnerId INT);
-GO
-	
-	INSERT INTO Taverns
-		(Name, LocationId, OwnerId)
-	VALUES
-		('The Swan',1,1),
-		('The Seven Stars',2,1),
-		('The Cony Head',3,2),
-		('The Pannier',4,2),
-		('The Headless Chicken',4,3) 
-
-DROP TABLE IF EXISTS Location
-
-CREATE TABLE Location(
+		CREATE TABLE Location(
 	id INT IDENTITY(1,1) PRIMARY KEY,
 	name VARCHAR(100));
 GO
@@ -48,8 +57,25 @@ GO
 		('Baltimore, MD'),
 		('Smyrna, DE'),
 		('Philadelphia, PA')
+
+CREATE TABLE Taverns(
+	Id INT IDENTITY(1,1) PRIMARY KEY,
+	Name VARCHAR (250),
+	LocationId INT,
+	OwnerId INT,
+	FOREIGN KEY (LocationId) REFERENCES Location(id),
+	FOREIGN KEY (OwnerId) REFERENCES Users(Id)
+	);
+GO
 	
-DROP TABLE IF EXISTS Roles;
+	INSERT INTO Taverns
+		(Name, LocationId, OwnerId)
+	VALUES
+		('The Swan',1,1),
+		('The Seven Stars',2,1),
+		('The Cony Head',3,2),
+		('The Pannier',4,2),
+		('The Headless Chicken',4,3)
 
 CREATE TABLE Roles(
 	Id TINYINT PRIMARY KEY,
@@ -64,7 +90,8 @@ GO
 		(2,'Bartender','Mix Beverages'),
 		(3,'Owner','Owner of Tavern'),
 		(4,'Bouncer','Taking care of Security'),
-		(5,'Waitress','Serve Beverages')
+		(5,'Waitress','Serve Beverages'),
+		(6,'Admin','take care of business')
 
 DROP TABLE IF EXISTS BasementRats;
 
@@ -82,29 +109,22 @@ GO
 		('Wormtail'),
 		('Remy')
 
-DROP TABLE IF EXISTS Supplies;
-
 CREATE TABLE Supplies (
-	SupplyId INT IDENTITY(1,1) PRIMARY KEY,
-	TavernId INT,
-	Unit VARCHAR(25),
-	Name VARCHAR(250),
-	Date DATE,
-	Count INT
+	Id INT IDENTITY(1,1) PRIMARY KEY,
+	Unit VARCHAR(50),
+	Name VARCHAR(50),
 	);
 GO
 
 	INSERT INTO Supplies
-		(TavernId, Unit, Name, Date, Count)
+		(Unit, Name)
 	VALUES
-		(1,'pound','salt','1993-07-13',3),
-		(1,'pound','sugar','2001-09-11',2),
-		(2,'ounce','tabasco','2015-03-05',5),
-		(3,'ml','vanilla extract','2008-11-21',100),
-		(4,'pound','almonds','2011-12-30',2),
-		(5,'pound','cumin','1923-04-05',10)
-
-DROP TABLE IF EXISTS Received;
+		('pound','salt'),
+		('pound','sugar'),
+		('ounce','tabasco'),
+		('ml','vanilla extract'),
+		('pound','almonds'),
+		('pound','cumin')
 
 CREATE TABLE Received(
 	Id INT IDENTITY(1,1) PRIMARY KEY,
@@ -112,7 +132,9 @@ CREATE TABLE Received(
 	TavernId INT,
 	Cost DECIMAL (18,2),
 	Amount DECIMAL (18,2),
-	Date DATE
+	Date DATE,
+	FOREIGN KEY (SupplyId) REFERENCES Supplies(Id),
+	FOREIGN KEY (TavernId) REFERENCES Taverns(Id)
 	);
 GO
 
@@ -126,44 +148,37 @@ INSERT INTO Received
 	(4,4.50,5,11,'2011-12-30'),
 	(5,5.25,5,21,'1923-04-05')
  
-DROP TABLE IF EXISTS Counts;
-
 CREATE TABLE Counts (
 	SupplyId INT,
 	Date DATE,
 	TavernId INT,
-	Count DECIMAL (18,2)
-)
-DROP TABLE IF EXISTS Sales;
+	Count DECIMAL (18,2),
+	FOREIGN KEY (SupplyId) REFERENCES Supplies(Id),
+	FOREIGN KEY (TavernId) REFERENCES Taverns(Id)
+);
 
-CREATE TABLE Sales(
-	Id INT IDENTITY (1,1) PRIMARY KEY,
-	TavernId INT,
-	GuestId INT,
-	ServiceId INT,
-	Price DECIMAL(18,2),
-	Date DATE,
-	Amount INT
+CREATE TABLE ServiceStatus (
+	id INT IDENTITY(1,1) PRIMARY KEY,
+	Name VARCHAR(50)
 	);
 GO
 
-	INSERT INTO Sales
-		(TavernId, GuestId, ServiceId, Price, Date, Amount)
+	INSERT INTO ServiceStatus
+		(Name)
 	VALUES
-		(1,1,1,15.0,'1993-07-13',4),
-		(1,1,2,8.0,'1987-06-11',3),
-		(2,2,2,21.75,'2000-01-01',8),
-		(3,3,3,10.25,'2013-10-08',11),
-		(4,4,4,9.99,'2013-08-23',3),
-		(5,5,5,8.50,'1985-10-03',4)
-
-DROP TABLE IF EXISTS Services;
+		('active'),
+		('inactive'),
+		('discontinued'),
+		('out of stock'),
+		('coming soon')
 
 CREATE TABLE Services(
 	id INT IDENTITY(1,1) PRIMARY KEY,
 	name VARCHAR(250),
 	StatusId INT,
 	TavernId INT
+	FOREIGN KEY (TavernId) REFERENCES Taverns(Id),
+	FOREIGN KEY (StatusId) REFERENCES ServiceStatus(id)
 	);
 GO
 
@@ -179,25 +194,6 @@ GO
 		('Order Food',2,3),
 		('Massage',1,5)
 
-DROP TABLE IF EXISTS  ServiceStatus;
-
-CREATE TABLE ServiceStatus (
-	id TINYINT IDENTITY(1,1) PRIMARY KEY,
-	Name VARCHAR(50)
-	);
-GO
-
-	INSERT INTO ServiceStatus
-		(Name)
-	VALUES
-		('active'),
-		('inactive'),
-		('discontinued'),
-		('out of stock'),
-		('coming soon')
-
-DROP TABLE IF EXISTS Guests;
-
 CREATE TABLE Guests (
 	id INT IDENTITY(1,1) PRIMARY KEY,
 	Name VARCHAR(250),
@@ -211,10 +207,33 @@ GO
 INSERT INTO Guests
 		(Name, Notes, Birthdate, Cakeday, Status)
 	VALUES
-		('erica','Allergic',1998-03-01,1998-01-01,'Depressed'),
-		('joan','wheelchair user',1953-07-23,1970-03-04,'Happy')
+		('erica','Allergic','1998-03-01','1998-01-01','Depressed'),
+		('joan','wheelchair user','1953-07-23','1970-03-04','Happy'),
+		('petra','loves candy','1934-08-21','1968-02-22','tired')
 
-DROP TABLE IF EXISTS GuestStatus;
+CREATE TABLE Sales(
+	Id INT IDENTITY (1,1) PRIMARY KEY,
+	TavernId INT,
+	GuestId INT,
+	ServiceId INT,
+	Price DECIMAL(18,2),
+	Date DATE,
+	Amount INT,
+	FOREIGN KEY (ServiceId) REFERENCES Services(Id),
+	FOREIGN KEY (GuestId) REFERENCES Guests(id),
+	FOREIGN KEY (TavernId) REFERENCES Taverns(Id)
+	);
+GO
+
+	INSERT INTO Sales
+		(TavernId, GuestId, ServiceId, Price, Date, Amount)
+	VALUES
+		(1,1,1,15.0,'1993-07-13',4),
+		(1,1,2,8.0,'1987-06-11',3),
+		(2,2,2,21.75,'2000-01-01',8),
+		(3,2,3,10.25,'2013-10-08',11),
+		(4,2,4,9.99,'2013-08-23',3),
+		(5,2,5,8.50,'1985-10-03',4)
 
 CREATE TABLE GuestStatus (
 	id TINYINT IDENTITY(1,1) PRIMARY KEY,
@@ -231,29 +250,9 @@ INSERT INTO GuestStatus
 		('out of stock'),
 		('coming soon')
 
-DROP TABLE IF EXISTS Levels;
-
-CREATE TABLE Levels (
-	id INT IDENTITY(1,1) PRIMARY KEY,
-	GuestId INT,
-	ClassId INT,
-	Date DATE
-	);
-GO
-
-INSERT INTO Levels
-		(GuestId, ClassId, Date)
-	VALUES
-		('active'),
-		('inactive'),
-		('discontinued'),
-		('out of stock'),
-		('coming soon')
-
-DROP TABLE IF EXISTS Classes;
 
 CREATE TABLE Classes (
-	id SMALLINT IDENTITY(1,1) PRIMARY KEY,
+	id INT IDENTITY(1,1) PRIMARY KEY,
 	Name VARCHAR(50)
 	);
 GO
@@ -261,13 +260,31 @@ GO
 INSERT INTO Classes
 		(Name)
 	VALUES
-		('active'),
-		('inactive'),
-		('discontinued'),
-		('out of stock'),
-		('coming soon')
+		('wizard'),
+		('horse'),
+		('fighter'),
+		('blacksmith'),
+		('court jester')
 
-DROP TABLE IF EXISTS SupplySales;
+
+CREATE TABLE Levels (
+	id INT IDENTITY(1,1) PRIMARY KEY,
+	GuestId INT,
+	ClassId INT,
+	Date DATE,
+	FOREIGN KEY (GuestId) REFERENCES Guests(id),
+	FOREIGN KEY (ClassId) REFERENCES Classes(Id)
+	);
+GO
+
+INSERT INTO Levels
+		(GuestId, ClassId, Date)
+	VALUES
+		(1,1,'2008-03-01'),
+		(2,1,'2008-03-01'),
+		(1,2,'2008-03-01'),
+		(2,3,'2008-03-01'),
+		(1,4,'2008-03-01')
 
 CREATE TABLE SupplySales (
 	Id INT IDENTITY(1,1) PRIMARY KEY,
@@ -279,11 +296,11 @@ GO
 INSERT INTO SupplySales
 		(SupplyId, TavernId)
 	VALUES
-		('active'),
-		('inactive'),
-		('discontinued'),
-		('out of stock'),
-		('coming soon')
+		(1,1),
+		(2,1),
+		(2,2),
+		(3,3),
+		(2,4)
 
 DROP TABLE BasementRats;
 
@@ -360,3 +377,77 @@ Name VARCHAR(250),
 UserId INT
 );
 */
+
+/* lab */
+
+SELECT Guests.Name as Guest_name, Classes.Name as Class_name, Levels.id as Level_Id from Guests JOIN Levels ON Levels.GuestId=Guests.id JOIN Classes On Levels.Classid=Guests.id;
+
+
+/* lab 2 */
+
+SELECT
+ CONCAT('CREATE TABLE ','KEYS',' (') as Keys
+ FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+  
+select * from INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+
+select * from INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS
+
+SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE source
+
+
+SELECT
+CONCAT('CREATE TABLE ',TABLE_NAME,'(') as queryPiece
+FROM INFORMATION_SCHEMA.TABLES
+WHERE TABLE_NAME='Taverns'
+UNION ALL
+SELECT CONCAT(cols.COLUMN_NAME,' ', cols.DATA_TYPE,
+(CASE
+	WHEN CHARACTER_MAXIMUM_LENGTH IS NOT NULL
+	THEN CONCAT('(', CAST(CHARACTER_MAXIMUM_LENGTH AS VARCHAR(100)),
+')') ELSE'' END),',') AS queryPiece FROM INFORMATION_SCHEMA.COLUMNS as cols WHERE
+TABLE_NAME = 'Taverns'
+UNION ALL
+SELECT ')';
+
+/* DB Assignment 4.1 */
+
+SELECT Users.Name as Username, Roles.Name as 
+Roledescription FROM Users JOIN Roles ON Roles.Id = Users.RoleId WHERE Roles.Name = 'Admin'
+
+/* DB Assignment 4.2 */
+
+SELECT DISTINCT Taverns.Name as Tavern_name, Location.name as Location_name, Users.Name as Username, Roles.Name as Roledescription
+FROM Taverns JOIN Location ON Taverns.LocationId=Location.id
+
+JOIN Users ON Users.Id=Taverns.OwnerId
+JOIN Roles ON Users.id=Roles.Id
+
+WHERE Roles.Name='Admin'
+
+/* WHERE Roles.Name='Admin' won't show, even though Admin role exists' ... ask in class ... */
+
+
+/* DB Assignment 4.3 */
+
+SELECT Guests.Name as Guest_Name, Classes.Name as Class_name, Levels.id as Level FROM Guests
+JOIN Levels ON Guests.id = Levels.GuestId
+JOIN Classes ON Levels.ClassId = Classes.id
+
+ORDER BY Guests.name ASC
+
+/* DB Assignment 4.4 */
+
+SELECT Sales.Price, Services.name as Service FROM Sales
+JOIN Services ON Services.id = Sales.ServiceId
+ORDER BY Sales.Price DESC
+
+/* DB Assignment 4.5 */
+
+SELECT Guests.Name as Guest_Name, Classes.Name as Class_name
+FROM Guests
+JOIN LEVELS ON Guests.id=Levels.GuestId
+JOIN Classes ON Levels.ClassId=Classes.id
+WHERE Classes.id > 2
+
+/* I need some help with Queries 6-9, will ask in class tonight, and some of the previous queries need some clarification/polish */
